@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BATTLE ZONE | Pro Gaming Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#000;
+  color:#fff;
+  text-align:center;
+}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  background:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.9)),
+  url('https://images.unsplash.com/photo-1542751371-adc38448a05e') center/cover;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.hero h1{font-size:55px;letter-spacing:4px}
+.hero p{margin:15px;color:#ccc}
+.hero button{
+  padding:15px 40px;
+  font-size:18px;
+  border:none;
+  border-radius:40px;
+  background:#facc15;
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* MENU */
+.menu{
+  background:#020617;
+  padding:20px;
+}
+.menu button{
+  margin:8px;
+  padding:12px 25px;
+  background:#111;
+  color:#fff;
+  border:1px solid #facc15;
+  border-radius:20px;
+  cursor:pointer;
+}
+.menu button:hover{background:#facc15;color:#000}
+
+/* GAME AREA */
+.game{
+  padding:40px 10px;
+}
+canvas{
+  background:#020617;
+  border-radius:12px;
+  box-shadow:0 0 20px #22c55e;
+}
+#info{margin-top:10px;color:#facc15}
+
+/* FOOTER */
+footer{
+  background:#020617;
+  padding:15px;
+  color:#777;
+  margin-top:40px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>BATTLE ZONE</h1>
+  <p>Inspired by BGMI & Free Fire</p>
+  <button onclick="showMenu()">PLAY NOW</button>
+</div>
+
+<!-- MENU -->
+<div class="menu" id="menu" style="display:none">
+  <h2>Select Game Mode</h2><br>
+  <button onclick="loadFPS()">ð¥ FPS Shooter</button>
+  <button onclick="loadSnake()">ð Snake Game</button>
+  <button onclick="loadAim()">ð¯ Aim Trainer</button>
+</div>
+
+<!-- GAME -->
+<div class="game">
+  <canvas id="game" width="360" height="280"></canvas>
+  <div id="info">Select a game</div>
+</div>
+
+<footer>
+Â© 2025 Battle Zone | Developed by Hussain Khan
+</footer>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const info=document.getElementById("info");
+
+let x=180,y=140,dx=3,dy=3,score=0,mode="";
+
+function showMenu(){
+ document.getElementById("menu").style.display="block";
+ window.scrollTo(0,document.body.scrollHeight);
+}
+
+/* FPS SHOOTER */
+function loadFPS(){
+ mode="fps";score=0;
+ info.innerText="FPS Shooter | Score: 0";
+ loop();
+}
+canvas.onclick=e=>{
+ if(mode==="fps"){
+  const r=canvas.getBoundingClientRect();
+  const cx=e.clientX-r.left;
+  const cy=e.clientY-r.top;
+  if(Math.hypot(cx-x,cy-y)<15){
+    score++;info.innerText="FPS Shooter | Score: "+score;
+  }
+ }
+}
+
+/* SNAKE */
+let snake=[[5,5]],food=[10,10],dir="right";
+function loadSnake(){
+ mode="snake";snake=[[5,5]];dir="right";
+ info.innerText="Snake Game";
+}
+document.onkeydown=e=>{
+ if(mode==="snake"){
+  if(e.key==="ArrowUp")dir="up";
+  if(e.key==="ArrowDown")dir="down";
+  if(e.key==="ArrowLeft")dir="left";
+  if(e.key==="ArrowRight")dir="right";
+ }
+}
+
+/* AIM TRAINER */
+function loadAim(){
+ mode="aim";score=0;
+ info.innerText="Aim Trainer | Score: 0";
+}
+
+/* LOOP */
+function loop(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ if(mode==="fps"||mode==="aim"){
+  ctx.beginPath();
+  ctx.arc(x,y,12,0,Math.PI*2);
+  ctx.fillStyle="#22c55e";
+  ctx.fill();
+  if(x<12||x>canvas.width-12)dx*=-1;
+  if(y<12||y>canvas.height-12)dy*=-1;
+  x+=dx;y+=dy;
+ }
+
+ if(mode==="snake"){
+  ctx.fillStyle="lime";
+  snake.forEach(s=>ctx.fillRect(s[0]*15,s[1]*15,14,14));
+  let h=snake[0].slice();
+  if(dir==="up")h[1]--;
+  if(dir==="down")h[1]++;
+  if(dir==="left")h[0]--;
+  if(dir==="right")h[0]++;
+  snake.unshift(h);snake.pop();
+ }
+
+ requestAnimationFrame(loop);
+}
+</script>
+
+</body>
+
