@@ -17,16 +17,20 @@ body{
 /* HERO */
 .hero{
   min-height:100vh;
-  background:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.9)),
+  background:linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.95)),
   url('https://images.unsplash.com/photo-1542751371-adc38448a05e') center/cover;
   display:flex;
   flex-direction:column;
   justify-content:center;
 }
-.hero h1{font-size:55px;letter-spacing:4px}
+.hero h1{
+  font-size:60px;
+  letter-spacing:5px;
+  color:#facc15;
+}
 .hero p{margin:15px;color:#ccc}
 .hero button{
-  padding:15px 40px;
+  padding:15px 45px;
   font-size:18px;
   border:none;
   border-radius:40px;
@@ -39,29 +43,34 @@ body{
 /* MENU */
 .menu{
   background:#020617;
-  padding:20px;
+  padding:25px;
 }
 .menu button{
-  margin:8px;
-  padding:12px 25px;
+  margin:10px;
+  padding:14px 30px;
   background:#111;
   color:#fff;
-  border:1px solid #facc15;
-  border-radius:20px;
+  border:2px solid #facc15;
+  border-radius:25px;
   cursor:pointer;
+  font-size:16px;
 }
 .menu button:hover{background:#facc15;color:#000}
 
-/* GAME AREA */
+/* GAME */
 .game{
   padding:40px 10px;
 }
 canvas{
   background:#020617;
-  border-radius:12px;
-  box-shadow:0 0 20px #22c55e;
+  border-radius:14px;
+  box-shadow:0 0 25px #22c55e;
 }
-#info{margin-top:10px;color:#facc15}
+#info{
+  margin-top:12px;
+  color:#facc15;
+  font-weight:bold;
+}
 
 /* FOOTER */
 footer{
@@ -69,6 +78,7 @@ footer{
   padding:15px;
   color:#777;
   margin-top:40px;
+  font-size:14px;
 }
 </style>
 </head>
@@ -78,16 +88,16 @@ footer{
 <!-- HERO -->
 <div class="hero">
   <h1>BATTLE ZONE</h1>
-  <p>Inspired by BGMI & Free Fire</p>
+  <p>FPS • Snake • Aim Trainer</p>
   <button onclick="showMenu()">PLAY NOW</button>
 </div>
 
 <!-- MENU -->
 <div class="menu" id="menu" style="display:none">
   <h2>Select Game Mode</h2><br>
-  <button onclick="loadFPS()">ð¥ FPS Shooter</button>
-  <button onclick="loadSnake()">ð Snake Game</button>
-  <button onclick="loadAim()">ð¯ Aim Trainer</button>
+  <button onclick="loadFPS()">FPS Shooter</button>
+  <button onclick="loadSnake()">Snake Game</button>
+  <button onclick="loadAim()">Aim Trainer</button>
 </div>
 
 <!-- GAME -->
@@ -97,7 +107,7 @@ footer{
 </div>
 
 <footer>
-Â© 2025 Battle Zone | Developed by Hussain Khan
+© 2025 Battle Zone | Developed by Hussain Khan
 </footer>
 
 <script>
@@ -105,55 +115,65 @@ const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
 const info=document.getElementById("info");
 
-let x=180,y=140,dx=3,dy=3,score=0,mode="";
+let mode="",score=0;
 
+/* COMMON */
 function showMenu(){
  document.getElementById("menu").style.display="block";
  window.scrollTo(0,document.body.scrollHeight);
 }
 
-/* FPS SHOOTER */
+/* FPS & AIM */
+let x=180,y=140,dx=3,dy=3;
+
 function loadFPS(){
  mode="fps";score=0;
  info.innerText="FPS Shooter | Score: 0";
- loop();
-}
-canvas.onclick=e=>{
- if(mode==="fps"){
-  const r=canvas.getBoundingClientRect();
-  const cx=e.clientX-r.left;
-  const cy=e.clientY-r.top;
-  if(Math.hypot(cx-x,cy-y)<15){
-    score++;info.innerText="FPS Shooter | Score: "+score;
-  }
- }
 }
 
-/* SNAKE */
-let snake=[[5,5]],food=[10,10],dir="right";
-function loadSnake(){
- mode="snake";snake=[[5,5]];dir="right";
- info.innerText="Snake Game";
-}
-document.onkeydown=e=>{
- if(mode==="snake"){
-  if(e.key==="ArrowUp")dir="up";
-  if(e.key==="ArrowDown")dir="down";
-  if(e.key==="ArrowLeft")dir="left";
-  if(e.key==="ArrowRight")dir="right";
- }
-}
-
-/* AIM TRAINER */
 function loadAim(){
  mode="aim";score=0;
  info.innerText="Aim Trainer | Score: 0";
 }
 
+canvas.onclick=e=>{
+ if(mode==="fps"||mode==="aim"){
+  const r=canvas.getBoundingClientRect();
+  const cx=e.clientX-r.left;
+  const cy=e.clientY-r.top;
+  if(Math.hypot(cx-x,cy-y)<14){
+    score++;
+    info.innerText=(mode==="fps"?"FPS Shooter":"Aim Trainer")+" | Score: "+score;
+  }
+ }
+}
+
+/* SNAKE */
+let snake=[],food=[],dir="right",grid=15;
+
+function loadSnake(){
+ mode="snake";
+ snake=[[8,8]];
+ food=[Math.floor(Math.random()*20),Math.floor(Math.random()*15)];
+ dir="right";
+ score=0;
+ info.innerText="Snake Game | Score: 0";
+}
+
+document.onkeydown=e=>{
+ if(mode==="snake"){
+  if(e.key==="ArrowUp"&&dir!=="down")dir="up";
+  if(e.key==="ArrowDown"&&dir!=="up")dir="down";
+  if(e.key==="ArrowLeft"&&dir!=="right")dir="left";
+  if(e.key==="ArrowRight"&&dir!=="left")dir="right";
+ }
+};
+
 /* LOOP */
 function loop(){
  ctx.clearRect(0,0,canvas.width,canvas.height);
 
+ /* FPS / AIM */
  if(mode==="fps"||mode==="aim"){
   ctx.beginPath();
   ctx.arc(x,y,12,0,Math.PI*2);
@@ -164,20 +184,39 @@ function loop(){
   x+=dx;y+=dy;
  }
 
+ /* SNAKE */
  if(mode==="snake"){
+  ctx.fillStyle="red";
+  ctx.fillRect(food[0]*grid,food[1]*grid,14,14);
+
   ctx.fillStyle="lime";
-  snake.forEach(s=>ctx.fillRect(s[0]*15,s[1]*15,14,14));
-  let h=snake[0].slice();
-  if(dir==="up")h[1]--;
-  if(dir==="down")h[1]++;
-  if(dir==="left")h[0]--;
-  if(dir==="right")h[0]++;
-  snake.unshift(h);snake.pop();
+  snake.forEach(s=>ctx.fillRect(s[0]*grid,s[1]*grid,14,14));
+
+  let head=snake[0].slice();
+  if(dir==="up")head[1]--;
+  if(dir==="down")head[1]++;
+  if(dir==="left")head[0]--;
+  if(dir==="right")head[0]++;
+
+  if(head[0]<0||head[1]<0||head[0]>23||head[1]>18){
+    mode="";info.innerText="Game Over";
+  }
+
+  snake.unshift(head);
+
+  if(head[0]===food[0]&&head[1]===food[1]){
+    score++;
+    food=[Math.floor(Math.random()*20),Math.floor(Math.random()*15)];
+    info.innerText="Snake Game | Score: "+score;
+  }else{
+    snake.pop();
+  }
  }
 
  requestAnimationFrame(loop);
 }
+loop();
 </script>
 
 </body>
-
+</html>
